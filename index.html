@@ -1,11 +1,63 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="utf-8">
     <title>Test</title>
-    <style>
-    </style>
+    <link rel="stylesheet" href="index.css" />
 </head>
-<body>
+<body onload="init()">
+    <!-- Mobile screen -->
+    <div id="mobile">
+        Unfortunately, your window needs to be at least 800 pixels wide and 600 pixels tall for this.
+        Please use another device or stretch your browser window and reload.
+    </div>
+
+    <!-- Welcome screen -->
+    <div class="main" id="welcome">
+        <div class="welcome-content" id="welcome-header">Welcome!</div>
+        <div class="welcome-content" id="welcome-text">
+            The next few pages will each feature a canvas, a sidebar with different features you can use, and a word or phrase in the top right corner.
+            You are tasked with drawing something related to the word.
+            The drawings themselves do not matter and will not be seen by anyone but yourself; do not feel pressured to make them beautiful, but please draw at least <i>something</i> related to the word.
+            Have fun with it, if you want!
+            <br/><br/>
+            There will be 2-4 rounds of 2 drawings each, and each drawing will have a different set of features in the sidebar.
+            After each round, you will be asked which set of features you liked better.
+            This website will record the sets of features you receive, your choices, and the time each drawing takes; by continuing, you consent to this information being collected and used.
+            <br/><br/>
+            This should take around 5-15 minutes total, depending on your choices and the detail you put into your drawings.
+            Ideally, it should be completed in one sitting.
+            If you are interrupted, however, or the time is not accurate in some other way, there will be an option to disregard the time you took on each round.
+            All in all, the time is not too important; it is just used as a measure to see how quickly you adapt to the interfaces.
+        </div>
+        <button class="welcome-content" id="welcome-start" onclick="doTest(1)">START</button>
+    </div>
+
+    <!-- Test screen -->
+    <div class="main" id="test">
+        <canvas></canvas>
+        <div id="sidebar">
+        </div>
+    </div>
+
+    <!-- Feature choice screen -->
+    <div class="main" id="choice">
+        <!-- two flex? -->
+    </div>
+
+    <!-- Data submission screen -->
+    <div class="main" id="submit">
+        <!-- ? -->
+        <form class="gform" method="POST" action="https://script.google.com/macros/s/AKfycbz0EsksQ_32naV01ooQzQ6xQ5_mzVUeaOE5FogEloqzZ7A5ZJOX/exec">
+            <div class="form-elements">
+                <button>Send</button>
+                <textarea name="Feature set"></textarea>
+            </div>
+        </form>
+    </div>
+
     <script src="index.js"></script>
+    <script src="canvas.js"></script>
+    <script data-cfasync="false" src="form-submission-handler.js"></script>
 </body>
 </html>
