@@ -59,7 +59,7 @@
       }
   
       disableAllButtons(form);
-      var url = form.action;
+      var url = spreadsheetScript;
       var xhr = new XMLHttpRequest();
       xhr.open('POST', url);
       xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");

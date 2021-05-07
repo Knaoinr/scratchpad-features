@@ -30,14 +30,13 @@
             If you are interrupted, however, or the time is not accurate in some other way, there will be an option to disregard the time you took on each round.
             All in all, the time is not too important; it is just used as a measure to see how quickly you adapt to the interfaces.
         </div>
-        <button class="welcome-content" id="welcome-start" onclick="doTest(1)">START</button>
+        <button class="welcome-content" id="welcome-start" onclick="startTests()">START</button>
     </div>
 
     <!-- Test screen -->
     <div class="main" id="test">
         <canvas></canvas>
-        <div id="sidebar">
-        </div>
+        <div id="sidebar"></div>
     </div>
 
     <!-- Feature choice screen -->
@@ -48,7 +47,7 @@
     <!-- Data submission screen -->
     <div class="main" id="submit">
         <!-- ? -->
-        <form class="gform" method="POST" action="https://script.google.com/macros/s/AKfycbz0EsksQ_32naV01ooQzQ6xQ5_mzVUeaOE5FogEloqzZ7A5ZJOX/exec">
+        <form class="gform" method="POST">
             <div class="form-elements">
                 <button>Send</button>
                 <textarea name="Feature set"></textarea>
@@ -56,6 +55,7 @@
         </form>
     </div>
 
+    <script src="feature.js"></script>
     <script src="index.js"></script>
     <script src="canvas.js"></script>
     <script data-cfasync="false" src="form-submission-handler.js"></script>

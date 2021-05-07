@@ -1,4 +1,8 @@
+const spreadsheetScript = "https://script.google.com/macros/s/AKfycbz0EsksQ_32naV01ooQzQ6xQ5_mzVUeaOE5FogEloqzZ7A5ZJOX/exec";
+
+var featureType;
 var times = [];
+var clicks = [];
 var startTime;
 
 function init() {
@@ -6,18 +10,33 @@ function init() {
     else document.getElementById("welcome").style.visibility = "visible";
 }
 
-function doTest(round, lastChoice) {
-    if (!lastChoice) document.getElementById("welcome").style.visibility = "hidden";
-    else document.getElementById("choice").style.visibility = "hidden";
+function startTests() {
+    document.getElementById("welcome-start").disabled = true;
+    httpGetAsync(spreadsheetScript, (val) => {
+        featureType = parseInt(val) % 2;
+        document.getElementById("welcome").style.visibility = "hidden";
+        doRound(3);
+    });
+}
 
+function doRound(roundNum, lastChoice) {
+    document.getElementById("choice").style.visibility = "hidden";
     document.getElementById("test").style.visibility = "visible";
 
-    startTime = Date.now();
+    doTest(roundNum, true);
+    //TODO
+}
 
-    console.log("test");
-    httpGetAsync("https://script.google.com/macros/s/AKfycbz0EsksQ_32naV01ooQzQ6xQ5_mzVUeaOE5FogEloqzZ7A5ZJOX/exec", (val) => {
-        console.log(val);
-    });
+function doTest(roundNum, first) {
+    var featSet = featSets[2*roundNum + !first];
+    var sidebar = document.getElementById("sidebar");
+    for(var i = 0; i < 64; i++) {
+        var e = document.createElement("button");
+        e.classList = "feature feature" + featureType;
+        sidebar.appendChild(e);
+    }
+
+    startTime = Date.now();
 }
 
 function httpGetAsync(url, callback) {

@@ -4,7 +4,7 @@ html, body {
     margin: 0px;
     border: 0;
     background-color: #ddc6d6;
-    overflow: hidden; /*  Disable scrollbars */
+    overflow: hidden; /* Disable scrollbars */
     display: block;  /* No floating content on sides */
     font-family: system-ui, sans-serif;
     color: #160138;
@@ -52,9 +52,28 @@ html, body {
 
 #sidebar {
     position: absolute;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-content: flex-start;
     width: 200px;
     height: 100%;
     border-right: 1px solid black;
+}
+
+.feature {
+    margin: 5px;
+    background-color: grey;
+}
+
+.feature0 {
+    width: 30px;
+    height: 30px;
+}
+
+.feature1 {
+    width: 90px;
+    height: 90px;
 }
 
 canvas {
