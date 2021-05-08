@@ -24,17 +24,23 @@ function doRound(roundNum, lastChoice) {
     document.getElementById("test").style.visibility = "visible";
 
     doTest(roundNum, true);
-    //TODO
+    //TODO: continue
 }
 
 function doTest(roundNum, first) {
     var featSet = featSets[2*roundNum + !first];
     var sidebar = document.getElementById("sidebar");
-    for(var i = 0; i < 64; i++) {
+    sidebar.children.foreach(child => { child.remove(); });
+    for(var i = 0; i < featSet.length; i++) {
         var e = document.createElement("button");
         e.classList = "feature feature" + featureType;
+        e.setAttribute("title", featNames[featSet[i]]);
+        e.onclick = featFuncs[featSet[i]];
         sidebar.appendChild(e);
     }
+
+    document.getElementById("test-word").innerText = "\"" + keywords[Math.abs(roundNum-3)*2 + !first] + "\"";
+    // document.getElementById("test-done").onclick = () => { doTest() };
 
     startTime = Date.now();
 }

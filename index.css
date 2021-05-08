@@ -1,7 +1,7 @@
 html, body {
     width: 100%;
     height: 100%;
-    margin: 0px;
+    margin: 0;
     border: 0;
     background-color: #ddc6d6;
     overflow: hidden; /* Disable scrollbars */
@@ -21,8 +21,8 @@ html, body {
 .main {
     visibility: hidden;
     position: absolute;
-    width: 100vw;
-    height: 100vh;
+    width: 100%;
+    height: 100%;
 }
 
 #welcome {
@@ -59,11 +59,16 @@ html, body {
     width: 200px;
     height: 100%;
     border-right: 1px solid black;
+    overflow-y: auto;
 }
 
 .feature {
     margin: 5px;
-    background-color: grey;
+    background-color: #0037ff;
+}
+
+.feature:hover {
+    background-color: #122e96;
 }
 
 .feature0 {
@@ -82,4 +87,40 @@ canvas {
     background-color: #eeeeee;
     width: calc(100vw - 200px);
     height: 100vh;
+}
+
+#test-container {
+    position: absolute;
+    right: 0;
+    margin: 10px;
+}
+
+#test-instructions {
+    display: inline-block;
+    font-size: 20px;
+}
+
+#test-word {
+    display: inline-block;
+    padding: 10px;
+    background-color: #ddc6d6;
+    font-size: 30px;
+    padding-left: 15px;
+    padding-right: 15px;
+    margin-left: 5px;
+}
+
+#test-done {
+    display: block;
+    right: 0;
+    position: absolute;
+    margin-top: 10px;
+    font-size: 15px;
+    padding: 5px;
+    background-color: #725098;
+    color: #eeeeee;
+}
+
+#test-done:hover {
+    background-color: #3f265c;
 }
