@@ -39,7 +39,163 @@ const featSets = [
     [5, 46, 44, 32, 58, 39, 27, 9, 12, 49, 41, 45, 8, 13, 23, 31, 10, 29, 14, 0, 47, 49, 18, 9, 22, 50, 28, 36, 21, 60, 51, 40, 57, 11, 53, 36, 55, 32, 20, 7, 29, 16, 8, 1, 25, 57, 28, 25, 0, 33, 17, 35, 27, 54, 13, 37, 61, 18, 5, 46, 7, 12, 1, 53, 58, 21, 19, 34, 2, 38, 15, 44, 56, 61, 4, 11, 41, 6, 19, 42, 4, 42, 60, 45, 43, 3, 62, 30, 43, 33, 22, 39, 56, 10, 6, 52, 14, 20, 3, 26, 48, 23, 63, 55, 24, 37, 62, 51, 15, 59, 52, 24, 31, 47, 34, 35, 2, 17, 48, 26, 40, 63, 59, 54, 38, 50, 16, 30]
 ];
 
+var featWindow = null; // The element corresponding to an open feature window
+
 const featFuncs = [
+    //Pen
+    () => {
+        penType = "pen";
+        penWidth = 3;
+    },
+    //Eraser
+    () => {
+        penType = "eraser";
+        penWidth = 20;
+    },
+    //Color grid
+    () => {},
+    //Large pen
+    () => {
+        penType = "pen";
+        penWidth = 10;
+    },
+    //Pan
+    () => {},
+    //Undo
+    () => {},
+    //Clear all
+    () => {
+        canvasArea.clear();
+    },
+    //Color picker
+    () => {},
+    //Straight line
+    () => {},
+    //Circle
+    () => {},
+    //Oval
+    () => {},
+    //Rectangle
+    () => {},
+    //Calligraphy pen
+    () => {},
+    //Change background color
+    () => {
+        canvasArea.canvas.style.backgroundColor = penColor;
+    },
+    //Set background image
+    () => {},
+    //Opacity
+    (ev) => {
+        if (featWindow) { featWindow.remove(); featWindow = null; return; }
+        featWindow = document.createElement("div");
+        featWindow.className = "feat-window";
+        featWindow.id = "feat15";
+        featWindow.style.top = "20px";
+        ev.target.appendChild(featWindow);
+        //TODO: overflow sidebar + add functionality
+    },
+    //Rake
+    () => {},
+    //Color wheel
+    () => {},
+    //Rock stamp
+    () => {},
+    //Grass stamp
+    () => {},
+    //Square eraser
+    () => {},
+    //Soft brush
+    () => {},
+    //Rotate left
+    () => {},
+    //Rotate right
+    () => {},
+    //Bomb
+    () => {},
+    //Small pen
+    () => {
+        penType = "pen";
+        penWidth = 1;
+    },
+    //Swirl
+    () => {},
+    //Double-pronged rake
+    () => {},
+    //Save your image
+    () => {},
+    //Horizontal line
+    () => {},
+    //Vertical line
+    () => {},
+    //Stick figure stamp
+    () => {},
+    //Smudge
+    () => {},
+    //Sparkles
+    () => {},
+    //Vertical mirror
+    () => {},
+    //Horizontal mirror
+    () => {},
+    //Change background image to a suggestion
+    () => {},
+    //Dust
+    () => {},
+    //Interference
+    () => {},
+    //Lamp
+    () => {},
+    //Bloom
+    () => {},
+    //Door stamp
+    () => {},
+    //Background gradient
+    () => {},
+    //Rainbow pen
+    () => {},
+    //Draw your own brush
+    () => {},
+    //Erase & blend rectangle
+    () => {},
+    //Recycling stamp
+    () => {},
+    //Hair stamp
+    () => {},
+    //Turn off all features
+    () => {},
+    //Highlighter
+    () => {},
+    //Lightning
+    () => {},
+    //Heart stamp
+    () => {},
+    //Ice crack
+    () => {},
+    //X-shaped brush
+    () => {},
+    //Mouse pointer stamp
+    () => {},
+    //Grid
+    () => {},
+    //Checkers stamp
+    () => {},
+    //Arrows
+    () => {},
+    //Cloud
+    () => {},
+    //Star stamp
+    () => {},
+    //Very large brush
+    () => {
+        penType = "pen";
+        penWidth = 20;
+    },
+    //:) stamp
+    () => {},
+    //wheee stamp
+    () => {},
+    //Sun stamp
     () => {}
 ];
 

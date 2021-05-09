@@ -4,8 +4,9 @@
     <meta charset="utf-8">
     <title>Test</title>
     <link rel="stylesheet" href="index.css" />
+    <link rel="stylesheet" href="featWindows.css" />
 </head>
-<body onload="init()">
+<body onload="offlineInit(0)">
     <!-- Mobile screen -->
     <div id="mobile">
         Unfortunately, your window needs to be at least 800 pixels wide and 600 pixels tall for this.
@@ -14,7 +15,7 @@
 
     <!-- Welcome screen -->
     <div class="main" id="welcome">
-        <div class="welcome-content" id="welcome-header">Welcome!</div>
+        <div class="welcome-content header">Welcome!</div>
         <div class="welcome-content" id="welcome-text">
             The next few pages will each feature a canvas, a sidebar with different features you can use, and a word or phrase in the top right corner.
             You are tasked with drawing something related to the word.
@@ -35,7 +36,7 @@
 
     <!-- Test screen -->
     <div class="main" id="test">
-        <canvas></canvas>
+        <canvas id="canvas"></canvas>
         <div id="sidebar"></div>
         <div id="test-container">
             <div id="test-instructions">Draw something related to</div>
@@ -46,7 +47,11 @@
 
     <!-- Feature choice screen -->
     <div class="main" id="choice">
-        <!-- two flex? -->
+        <div class="header">Which features do you prefer?</div>
+        <div id="choice-container">
+            <button class="choice-button" id="choice-button-1"></button>
+            <button class="choice-button" id="choice-button-2"></button>
+        </div>
     </div>
 
     <!-- Data submission screen -->

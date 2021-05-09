@@ -1,0 +1,9 @@
+.feat-window {
+    position: absolute;
+}
+
+#feat15 {
+    width: 120px;
+    height: 30px;
+    background-color: grey;
+}

@@ -36,7 +36,7 @@ html, body {
     margin: 20px;
 }
 
-#welcome-header {
+.header {
     font-size: xx-large;
 }
 
@@ -74,6 +74,7 @@ html, body {
 .feature0 {
     width: 30px;
     height: 30px;
+    background-size: contain;
 }
 
 .feature1 {
@@ -85,8 +86,6 @@ canvas {
     position: absolute;
     left: 200px;
     background-color: #eeeeee;
-    width: calc(100vw - 200px);
-    height: 100vh;
 }
 
 #test-container {
@@ -123,4 +122,22 @@ canvas {
 
 #test-done:hover {
     background-color: #3f265c;
+}
+
+#choice {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+#choice-container {
+    width: 700px;
+}
+
+.choice-button {
+    display: inline-block;
+    width: 40%;
+    height: 100%;
+    margin: 20px;
 }
