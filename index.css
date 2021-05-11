@@ -82,10 +82,33 @@ html, body {
     height: 90px;
 }
 
-canvas {
+.feat-window {
+    position: absolute;
+    margin: 10px;
+    left: 200px;
+    background-color: grey;
+    padding: 5px;
+    color: white;
+    border: 1px solid black;
+}
+
+#canvas-img {
     position: absolute;
     left: 200px;
+    height: 100vh;
+    width: calc(100vw - 200px);
+    object-fit: cover;
+}
+
+#back-canvas {
+    position: absolute;
     background-color: #eeeeee;
+    left: 200px;
+}
+
+#canvas {
+    position: absolute;
+    left: 200px;
 }
 
 #test-container {

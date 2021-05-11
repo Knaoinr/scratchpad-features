@@ -2,7 +2,7 @@ const featNames = [
     "Pen", "Eraser", "Color grid", "Large pen", "Pan", "Undo", "Clear all", "Color picker", "Straight line", "Circle", //0-9
     "Oval", "Rectangle", "Calligraphy pen", "Change background color", "Set background image", "Opacity", "Rake", "Color wheel", "Rock stamp", "Grass stamp", //10-19
     "Square eraser", "Soft brush", "Rotate left", "Rotate right", "Bomb", "Small pen", "Swirl", "Double-pronged rake", "Save your image", "Horizontal line", //20-29
-    "Vertical line", "Stick figure stamp", "Smudge", "Sparkles", "Vertical mirror", "Horizontal mirror", "Change background image to a suggestion", "Dust", "Interference", "Lamp", //30-39
+    "Vertical line", "Stick figure stamp", "Smudge", "Sparkles", "Vertical flip", "Horizontal flip", "Change background image to a suggestion", "Dust", "Interference", "Lamp", //30-39
     "Bloom", "Door stamp", "Background gradient", "Rainbow pen", "Draw your own brush", "Erase & blend rectangle", "Recycling stamp", "Hair stamp", "Turn off all features", "Highlighter", //40-49
     "Lightning", "Heart stamp", "Ice crack", "X-shaped brush", "Mouse pointer stamp", "Grid", "Checkers stamp", "Arrows", "Cloud", "Star stamp", //50-59
     "Very large brush", ":) stamp", "wheee stamp", "Sun stamp" //60-63
@@ -65,40 +65,86 @@ const featFuncs = [
     () => {},
     //Clear all
     () => {
-        canvasArea.clear();
+        canvasArea.clearBack();
     },
     //Color picker
-    () => {},
+    () => {
+        penType = "colorPicker";
+    },
     //Straight line
-    () => {},
+    () => {
+        penType = "straight";
+    },
     //Circle
-    () => {},
+    () => {
+        penType = "circle";
+    },
     //Oval
-    () => {},
+    () => {
+        penType = "oval";
+    },
     //Rectangle
-    () => {},
+    () => {
+        penType = "rect";
+    },
     //Calligraphy pen
     () => {},
     //Change background color
     () => {
-        canvasArea.canvas.style.backgroundColor = penColor;
+        canvasArea.backCanvas.style.backgroundColor = getPenColor();
     },
     //Set background image
-    () => {},
-    //Opacity
-    (ev) => {
+    () => {
         if (featWindow) { featWindow.remove(); featWindow = null; return; }
+
+        var backImage = document.getElementById("canvas-img");
+        featWindow = document.createElement("div");
+        featWindow.className = "feat-window";
+        featWindow.id = "feat14";
+        featWindow.innerHTML = "<div>Link to image:</div><input type=\"text\" value=\"" + (backImage.src || "") + "\">";
+        featWindow.onchange = () => {
+            try {
+                backImage.src = featWindow.lastElementChild.value;
+                canvasArea.backCanvas.style.backgroundColor = (featWindow.lastElementChild.value == "") ? "" : "transparent";
+            } catch (e) {
+                backImage.src = "";
+                canvasArea.backCanvas.style.backgroundColor = "";
+            }
+        };
+        document.getElementById("test").appendChild(featWindow);
+    },
+    //Opacity
+    () => {
+        if (featWindow) { featWindow.remove(); featWindow = null; return; }
+
         featWindow = document.createElement("div");
         featWindow.className = "feat-window";
         featWindow.id = "feat15";
-        featWindow.style.top = "20px";
-        ev.target.appendChild(featWindow);
-        //TODO: overflow sidebar + add functionality
+        featWindow.innerHTML = "<div>Opacity:</div><input type=\"range\" min=\"0\" max=\"100\" value=\"" + penColor.a*100 + "\">";
+        featWindow.onchange = () => {
+            penColor.a = featWindow.lastElementChild.value/100;
+            canvasArea.canvas.style.opacity = penColor.a;
+        };
+        document.getElementById("test").appendChild(featWindow);
     },
     //Rake
     () => {},
     //Color wheel
-    () => {},
+    () => {
+        if (featWindow) { featWindow.remove(); featWindow = null; return; }
+
+        featWindow = document.createElement("div");
+        featWindow.className = "feat-window";
+        featWindow.id = "feat17";
+        featWindow.innerHTML = "<div>Choose a color:</div><input type=\"color\" value=\"" + getHex() + "\">";
+        featWindow.onchange = () => {
+            var val = featWindow.lastElementChild.value;
+            penColor.r = parseInt(val.substring(1, 3), 16);
+            penColor.g = parseInt(val.substring(3, 5), 16);
+            penColor.b = parseInt(val.substring(5, 7), 16);
+        };
+        document.getElementById("test").appendChild(featWindow);
+    },
     //Rock stamp
     () => {},
     //Grass stamp
@@ -125,9 +171,13 @@ const featFuncs = [
     //Save your image
     () => {},
     //Horizontal line
-    () => {},
+    () => {
+        penType = "horizontal";
+    },
     //Vertical line
-    () => {},
+    () => {
+        penType = "vertical";
+    },
     //Stick figure stamp
     () => {},
     //Smudge
@@ -135,11 +185,27 @@ const featFuncs = [
     //Sparkles
     () => {},
     //Vertical mirror
-    () => {},
+    () => {
+        transform.scaleY *= -1;
+        applyTransform();
+    },
     //Horizontal mirror
-    () => {},
+    () => {
+        transform.scaleX *= -1;
+        applyTransform();
+    },
     //Change background image to a suggestion
-    () => {},
+    (roundNum, first) => {
+        var backImage = document.getElementById("canvas-img");
+        if (!backImage.src || backImage.src == "") {
+            canvasArea.backCanvas.style.backgroundColor = "transparent";
+            backImage.src = imageLinks[Math.abs(roundNum-3)*2 + !first];
+        }
+        else {
+            backImage.src = "";
+            canvasArea.backCanvas.style.backgroundColor = "";
+        }
+    },
     //Dust
     () => {},
     //Interference
@@ -163,7 +229,9 @@ const featFuncs = [
     //Hair stamp
     () => {},
     //Turn off all features
-    () => {},
+    () => {
+        penType = null;
+    },
     //Highlighter
     () => {},
     //Lightning
@@ -201,4 +269,23 @@ const featFuncs = [
 
 const keywords = [
     "major", "marriage", "traffic jam", "insurance", "volcano", "coach", "disaster", "conditions"
+];
+
+const imageLinks = [
+    //major
+    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT4W9n-ocdfYP8Xxvt_e3ZDbW4DogFUNsNMEw&usqp=CAU",
+    //marriage
+    "https://cdn.wedding-spot.com/__sized__/images/venues/15377/Iberostar-Rose-Hall-Beach-Montego-Bay-Jamaica-118aca4b-d20a-41d3-bcb4-cdfb1ed28a43-97450e389c42885476f1fbe9bc5bca5a.jpg",
+    //traffic jam
+    "https://media.fugro.com/media/images/default-source/services/highways.jpg?sfvrsn=79a53b1a_19",
+    //insurance
+    "https://www.ecocladding.com/sites/default/files/Kinsale%20Insurance3.jpg",
+    //volcano
+    "https://cdn.britannica.com/67/19367-050-885866B4/Valley-Taurus-Mountains-Turkey.jpg",
+    //coach
+    "https://pbs.twimg.com/media/EiDhRVPWsAESyvJ.jpg",
+    //disaster
+    "https://www.centreforcities.org/wp-content/uploads/2018/11/UK_town_x1650-1630x845.jpg",
+    //conditions
+    "https://www.rev.com/blog/wp-content/uploads/2020/03/How-to-Add-Captions-Subtitles-to-Blackboard-Online-Courses.jpg"
 ];

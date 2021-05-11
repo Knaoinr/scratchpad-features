@@ -51,7 +51,7 @@ function doTest(roundNum, first) {
                 featWindow.remove();
                 featWindow = null;
             }
-            featFuncs[featSet[j]](ev);
+            featFuncs[featSet[j]](roundNum, first);
             clicks[2*roundNum + !first][featSet[j]]++;
         };
         sidebar.appendChild(e);
@@ -60,7 +60,10 @@ function doTest(roundNum, first) {
     document.getElementById("test-word").innerText = "\"" + keywords[Math.abs(roundNum-3)*2 + !first] + "\"";
     document.getElementById("test-done").onclick = () => {
         times[2*roundNum + !first] = (Date.now() - startTime)/1000;
-        canvasArea.clear(); //TODO: save image
+        //TODO: merge image onto canvas, if applicable
+        canvasArea.clearBack(); //TODO: save image
+        document.getElementById("canvas-img").src = "";
+        canvasArea.backCanvas.style.backgroundColor = "";
         if (first) doTest(roundNum, false);
         else compare(roundNum);
     };
