@@ -150,7 +150,9 @@ const featFuncs = [
     //Grass stamp
     () => {},
     //Square eraser
-    () => {},
+    () => {
+        penType = "squareEraser";
+    },
     //Soft brush
     () => {},
     //Rotate left
@@ -169,7 +171,7 @@ const featFuncs = [
     //Double-pronged rake
     () => {},
     //Save your image
-    () => {},
+    () => {}, //nothing lol
     //Horizontal line
     () => {
         penType = "horizontal";
@@ -179,7 +181,9 @@ const featFuncs = [
         penType = "vertical";
     },
     //Stick figure stamp
-    () => {},
+    () => {
+        penType = "stickFig";
+    },
     //Smudge
     () => {},
     //Sparkles
@@ -225,7 +229,9 @@ const featFuncs = [
     //Erase & blend rectangle
     () => {},
     //Recycling stamp
-    () => {},
+    () => {
+        penType = "recycle";
+    },
     //Hair stamp
     () => {},
     //Turn off all features

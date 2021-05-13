@@ -30,19 +30,22 @@ var canvasArea = {
             var ctx = canvasArea.context;
             switch (penType) {
                 case "pen":
+                    ctx.save();
                     ctx.beginPath();
                     ctx.arc(ev.x - sidebarWidth, ev.y, penWidth/2, 0, 2 * Math.PI, true);
-                    ctx.globalCompositeOperation = "source-over";
                     ctx.fillStyle = getFlatPenColor();
                     ctx.fill();
+                    ctx.restore();
                     break;
                 case "eraser":
                     ctx = canvasArea.backContext;
+                    ctx.save();
                     ctx.beginPath();
                     ctx.arc(ev.x - sidebarWidth, ev.y, penWidth/2, 0, 2 * Math.PI, true);
                     ctx.globalCompositeOperation = "destination-out";
                     ctx.fillStyle = "rgba(255,255,255,1)";
                     ctx.fill();
+                    ctx.restore();
                     break;
                 case "colorPicker":
                     ctx = canvasArea.backContext;
@@ -51,6 +54,31 @@ var canvasArea = {
                     penColor.g = imageData.data[1];
                     penColor.b = imageData.data[2];
                     break;
+                case "squareEraser":
+                    ctx = canvasArea.backContext;
+                    ctx.save();
+                    ctx.globalCompositeOperation = "destination-out";
+                    ctx.fillStyle = "rgba(255,255,255,1)";
+                    var s = penWidth*2;
+                    ctx.fillRect(ev.x - sidebarWidth - s/2, ev.y - s/2, s, s);
+                    ctx.restore();
+                    break;
+                case "stickFig":
+                    ctx = canvasArea.backContext;
+                    var img = new Image();
+                    img.onload = () => {
+                        ctx.drawImage(img, ev.x - sidebarWidth - img.width/2, ev.y - img.height/2, img.width, img.height);
+                    }
+                    img.src = "imgs/stickFig.png";
+                    break;
+                case "recycle":
+                    ctx = canvasArea.backContext;
+                    var img = new Image();
+                    img.onload = () => {
+                        ctx.drawImage(img, ev.x - sidebarWidth - img.width/2, ev.y - img.height/2, img.width, img.height);
+                    }
+                    img.src = "imgs/recycle.png";
+                    break;
             }
 
             lastPenX = ev.x;
@@ -58,8 +86,8 @@ var canvasArea = {
         });
         this.canvas.addEventListener("mouseup", (ev) => {
             isPenDown = false;
-            canvasArea.backContext.globalAlpha = penColor.a;
             canvasArea.backContext.save();
+            canvasArea.backContext.globalAlpha = penColor.a;
             canvasArea.backContext.scale(transform.scaleX, transform.scaleY);
             canvasArea.backContext.drawImage(canvasArea.canvas, 0, 0, this.canvas.width*transform.scaleX, this.canvas.height*transform.scaleY);
             canvasArea.backContext.restore();
@@ -70,6 +98,7 @@ var canvasArea = {
                 var ctx = canvasArea.context;
                 switch (penType) {
                     case "pen":
+                        ctx.save();
                         ctx.beginPath();
                         ctx.moveTo(lastPenX - sidebarWidth, lastPenY);
                         ctx.lineTo(ev.x - sidebarWidth, ev.y);
@@ -77,9 +106,11 @@ var canvasArea = {
                         ctx.lineCap = "round";
                         ctx.lineWidth = penWidth;
                         ctx.stroke();
+                        ctx.restore();
                         break;
                     case "eraser":
-                        ctx = canvasArea.backCanvas;
+                        ctx = canvasArea.backContext;
+                        ctx.save();
                         ctx.beginPath();
                         ctx.moveTo(lastPenX - sidebarWidth, lastPenY);
                         ctx.lineTo(ev.x - sidebarWidth, ev.y);
@@ -87,9 +118,11 @@ var canvasArea = {
                         ctx.lineCap = "round";
                         ctx.lineWidth = penWidth;
                         ctx.stroke();
+                        ctx.restore();
                         break;
                     case "straight":
                         canvasArea.clear();
+                        ctx.save();
                         ctx.beginPath();
                         ctx.moveTo(lastPenX - sidebarWidth, lastPenY);
                         ctx.lineTo(ev.x - sidebarWidth, ev.y);
@@ -97,9 +130,11 @@ var canvasArea = {
                         ctx.lineCap = "round";
                         ctx.lineWidth = penWidth;
                         ctx.stroke();
+                        ctx.restore();
                         return; //don't update lastPen
                     case "circle":
                         canvasArea.clear();
+                        ctx.save();
                         ctx.beginPath();
                         var delta = {x: lastPenX - ev.x, y: lastPenY - ev.y};
                         var rad = Math.sqrt(delta.x*delta.x + delta.y*delta.y)/2;
@@ -108,9 +143,11 @@ var canvasArea = {
                         ctx.lineCap = "round";
                         ctx.lineWidth = penWidth;
                         ctx.stroke();
+                        ctx.restore();
                         return; //don't update lastPen
                     case "oval":
                         canvasArea.clear();
+                        ctx.save();
                         ctx.beginPath();
                         var delta = {x: lastPenX - ev.x, y: lastPenY - ev.y};
                         ctx.ellipse(lastPenX - sidebarWidth - delta.x/2, lastPenY - delta.y/2, Math.abs(delta.x)/2, Math.abs(delta.y)/2, 0, 0, 2*Math.PI);
@@ -118,18 +155,22 @@ var canvasArea = {
                         ctx.lineCap = "round";
                         ctx.lineWidth = penWidth;
                         ctx.stroke();
+                        ctx.restore();
                         return; //don't update lastPen
                     case "rect":
                         canvasArea.clear();
+                        ctx.save();
                         ctx.beginPath();
                         ctx.strokeStyle = getFlatPenColor();
                         ctx.lineCap = "round";
                         ctx.lineWidth = penWidth;
                         var delta = {x: ev.x - lastPenX, y: ev.y - lastPenY};
                         ctx.strokeRect(lastPenX - sidebarWidth, lastPenY, delta.x, delta.y);
+                        ctx.restore();
                         return; //don't update lastPen
                     case "horizontal":
                         canvasArea.clear();
+                        ctx.save();
                         ctx.beginPath();
                         ctx.moveTo(lastPenX - sidebarWidth, lastPenY);
                         ctx.lineTo(ev.x - sidebarWidth, lastPenY);
@@ -137,9 +178,11 @@ var canvasArea = {
                         ctx.lineCap = "round";
                         ctx.lineWidth = penWidth;
                         ctx.stroke();
+                        ctx.restore();
                         return; //don't update lastPen
                     case "vertical":
                         canvasArea.clear();
+                        ctx.save();
                         ctx.beginPath();
                         ctx.moveTo(lastPenX - sidebarWidth, lastPenY);
                         ctx.lineTo(lastPenX - sidebarWidth, ev.y);
@@ -147,7 +190,23 @@ var canvasArea = {
                         ctx.lineCap = "round";
                         ctx.lineWidth = penWidth;
                         ctx.stroke();
+                        ctx.restore();
                         return; //don't update lastPen
+                    case "squareEraser":
+                        ctx = canvasArea.backContext;
+                        ctx.save();
+                        ctx.globalCompositeOperation = "destination-out";
+                        ctx.beginPath();
+                        var s = penWidth*2;
+                        ctx.moveTo(lastPenX - sidebarWidth, lastPenY);
+                        ctx.lineTo(ev.x - sidebarWidth, ev.y);
+                        ctx.strokeStyle = "rgba(255,255,255,1)";
+                        ctx.lineWidth = s;
+                        ctx.stroke();
+                        ctx.fillStyle = "rgba(255,255,255,1)";
+                        ctx.fillRect(ev.x - sidebarWidth - s/2, ev.y - s/2, s, s);
+                        ctx.restore();
+                        break;
                 }
 
                 lastPenX = ev.x;
