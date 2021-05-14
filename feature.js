@@ -1,5 +1,5 @@
 const featNames = [
-    "Pen", "Eraser", "Color grid", "Large pen", "Pan", "Undo", "Clear all", "Color picker", "Straight line", "Circle", //0-9
+    "Pen", "Eraser", "Color grid", "Large pen", "Undo", "Redo", "Clear all", "Color picker", "Straight line", "Circle", //0-9
     "Oval", "Rectangle", "Calligraphy pen", "Change background color", "Set background image", "Opacity", "Rake", "Color wheel", "Rock stamp", "Grass stamp", //10-19
     "Square eraser", "Soft brush", "Rotate left", "Rotate right", "Bomb", "Small pen", "Swirl", "Double-pronged rake", "Save your image", "Horizontal line", //20-29
     "Vertical line", "Stick figure stamp", "Smudge", "Sparkles", "Vertical flip", "Horizontal flip", "Change background image to a suggestion", "Dust", "Interference", "Lamp", //30-39
@@ -59,13 +59,28 @@ const featFuncs = [
         penType = "pen";
         penWidth = 10;
     },
-    //Pan
-    () => {},
     //Undo
-    () => {},
+    () => {
+        if (currentHistIndex > 0) {
+            currentHistIndex--;
+            var saved = new Image();
+            saved.onload = function () { canvasArea.clearBack(); canvasArea.backContext.drawImage(saved, 0, 0); }
+            saved.src = canvasHist[currentHistIndex];
+        }
+    },
+    //Redo
+    () => {
+        if (currentHistIndex < canvasHist.length-1) {
+            currentHistIndex++;
+            var saved = new Image();
+            saved.onload = function () { canvasArea.clearBack(); canvasArea.backContext.drawImage(saved, 0, 0); }
+            saved.src = canvasHist[currentHistIndex];
+        }
+    },
     //Clear all
     () => {
         canvasArea.clearBack();
+        recordBackCanvas();
     },
     //Color picker
     () => {
@@ -88,7 +103,9 @@ const featFuncs = [
         penType = "rect";
     },
     //Calligraphy pen
-    () => {},
+    () => {
+        penType = "calligraphy";
+    },
     //Change background color
     () => {
         canvasArea.backCanvas.style.backgroundColor = getPenColor();
@@ -142,6 +159,7 @@ const featFuncs = [
             penColor.r = parseInt(val.substring(1, 3), 16);
             penColor.g = parseInt(val.substring(3, 5), 16);
             penColor.b = parseInt(val.substring(5, 7), 16);
+            penColor.rainbow = null;
         };
         document.getElementById("test").appendChild(featWindow);
     },
@@ -223,7 +241,9 @@ const featFuncs = [
     //Background gradient
     () => {},
     //Rainbow pen
-    () => {},
+    () => {
+        penColor.rainbow = 0;
+    },
     //Draw your own brush
     () => {},
     //Erase & blend rectangle
@@ -237,13 +257,17 @@ const featFuncs = [
     //Turn off all features
     () => {
         penType = null;
+        penWidth = 3;
+        penColor = {r: 0, g: 0, b: 0, a: 1, rainbow: null};
     },
     //Highlighter
     () => {},
     //Lightning
     () => {},
     //Heart stamp
-    () => {},
+    () => {
+        penType = "hearts";
+    },
     //Ice crack
     () => {},
     //X-shaped brush

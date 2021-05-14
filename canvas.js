@@ -5,9 +5,12 @@ var lastPenX = 0;
 var lastPenY = 0;
 
 var penWidth = 3;
-var penColor = {r: 0, g: 0, b: 0, a: 1};
+var penColor = {r: 0, g: 0, b: 0, a: 1, rainbow: null};
 
 var transform = {rotate: 0, scaleX: 1, scaleY: 1};
+
+var canvasHist = [];
+var currentHistIndex = 0;
 
 const sidebarWidth = 200;
 
@@ -22,6 +25,7 @@ var canvasArea = {
         this.backCanvas.height = this.canvas.height;
         this.context = this.canvas.getContext("2d");
         this.backContext = this.backCanvas.getContext("2d");
+        canvasHist[0] = this.backCanvas.toDataURL();
 
         //listeners for painting
         this.canvas.addEventListener("mousedown", (ev) => {
@@ -64,20 +68,23 @@ var canvasArea = {
                     ctx.restore();
                     break;
                 case "stickFig":
-                    ctx = canvasArea.backContext;
-                    var img = new Image();
-                    img.onload = () => {
-                        ctx.drawImage(img, ev.x - sidebarWidth - img.width/2, ev.y - img.height/2, img.width, img.height);
-                    }
-                    img.src = "imgs/stickFig.png";
+                    drawStamp(ev, "imgs/stickFig.png");
                     break;
                 case "recycle":
-                    ctx = canvasArea.backContext;
-                    var img = new Image();
-                    img.onload = () => {
-                        ctx.drawImage(img, ev.x - sidebarWidth - img.width/2, ev.y - img.height/2, img.width, img.height);
-                    }
-                    img.src = "imgs/recycle.png";
+                    drawStamp(ev, "imgs/recycle.png");
+                    break;
+                case "hearts":
+                    drawStamp(ev, "imgs/hearts.png");
+                    break;
+                case "calligraphy":
+                    ctx.save();
+                    ctx.beginPath();
+                    ctx.moveTo(ev.x - sidebarWidth - penWidth/2, ev.y + penWidth);
+                    ctx.lineTo(ev.x - sidebarWidth + penWidth/2, ev.y - penWidth);
+                    ctx.strokeStyle = getFlatPenColor();
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    ctx.restore();
                     break;
             }
 
@@ -92,6 +99,8 @@ var canvasArea = {
             canvasArea.backContext.drawImage(canvasArea.canvas, 0, 0, this.canvas.width*transform.scaleX, this.canvas.height*transform.scaleY);
             canvasArea.backContext.restore();
             canvasArea.clear();
+
+            recordBackCanvas();
         });
         this.canvas.addEventListener("mousemove", (ev) => {
             if (isPenDown) {
@@ -207,6 +216,18 @@ var canvasArea = {
                         ctx.fillRect(ev.x - sidebarWidth - s/2, ev.y - s/2, s, s);
                         ctx.restore();
                         break;
+                    case "calligraphy":
+                        ctx.save();
+                        ctx.beginPath();
+                        ctx.moveTo(lastPenX - sidebarWidth - penWidth/2, lastPenY + penWidth);
+                        ctx.lineTo(ev.x - sidebarWidth - penWidth/2, ev.y + penWidth);
+                        ctx.lineTo(ev.x - sidebarWidth + penWidth/2, ev.y - penWidth);
+                        ctx.lineTo(lastPenX - sidebarWidth + penWidth/2, lastPenY - penWidth);
+                        ctx.closePath();
+                        ctx.fillStyle = getFlatPenColor();
+                        ctx.fill();
+                        ctx.restore();
+                        break;
                 }
 
                 lastPenX = ev.x;
@@ -223,11 +244,22 @@ var canvasArea = {
 }
 
 function getPenColor() {
+    rainbow();
     return "rgba(" + penColor.r + "," + penColor.g + "," + penColor.b + "," + penColor.a + ")";
 }
 
 function getFlatPenColor() {
+    rainbow();
     return "rgb(" + penColor.r + "," + penColor.g + "," + penColor.b + ")";
+}
+
+function rainbow() {
+    if (penColor.rainbow !== null) {
+        penColor.rainbow += 0.1;
+        penColor.r = Math.round(128*(Math.sin(penColor.rainbow)+1));
+        penColor.g = Math.round(128*(Math.sin(penColor.rainbow + 2*Math.PI/3)+1));
+        penColor.b = Math.round(128*(Math.sin(penColor.rainbow + 4*Math.PI/3)+1));
+    }
 }
 
 function getHex() {
@@ -236,4 +268,23 @@ function getHex() {
 
 function applyTransform() {
     canvasArea.backCanvas.style.transform = "rotate(" + transform.rotate + ") scaleX(" + transform.scaleX + ") scaleY(" + transform.scaleY + ")";
+}
+
+function recordBackCanvas() {
+    if (currentHistIndex > 30) { canvasHist.splice(0, 1); currentHistIndex--; }
+    currentHistIndex++;
+    try {
+        canvasHist[currentHistIndex] = canvasArea.backCanvas.toDataURL();
+    } catch (e) {
+        currentHistIndex--;
+    }
+}
+
+function drawStamp(ev, url) {
+    ctx = canvasArea.backContext;
+    var img = new Image();
+    img.onload = () => {
+        ctx.drawImage(img, ev.x - sidebarWidth - img.width/2, ev.y - img.height/2, img.width, img.height);
+    }
+    img.src = url;
 }

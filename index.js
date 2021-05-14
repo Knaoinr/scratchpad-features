@@ -36,6 +36,8 @@ function doRound(roundNum) {
 }
 
 function doTest(roundNum, first) {
+    featFuncs[48](); //reset features
+
     var featSet = featSets[2*roundNum + !first];
     var sidebar = document.getElementById("sidebar");
     for(var i = sidebar.children.length-1; i >= 0; i--) sidebar.children.item(i).remove();
