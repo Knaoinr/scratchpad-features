@@ -124,6 +124,7 @@ var canvasArea = {
                         ctx.moveTo(lastPenX - sidebarWidth, lastPenY);
                         ctx.lineTo(ev.x - sidebarWidth, ev.y);
                         ctx.strokeStyle = "rgba(255,255,255,1)";
+                        ctx.globalCompositeOperation = "destination-out";
                         ctx.lineCap = "round";
                         ctx.lineWidth = penWidth;
                         ctx.stroke();

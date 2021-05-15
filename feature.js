@@ -53,7 +53,32 @@ const featFuncs = [
         penWidth = 20;
     },
     //Color grid
-    () => {},
+    () => {
+        if (featWindow) { featWindow.remove(); featWindow = null; return; }
+
+        featWindow = document.createElement("div");
+        featWindow.className = "feat-window";
+        featWindow.id = "feat2";
+        featWindow.innerHTML = "<div>Choose a color:</div><img id=\"feat2-img\"></img><canvas id=\"feat2-canvas\"></canvas>";
+        document.getElementById("test").appendChild(featWindow);
+
+        var featImg = document.getElementById("feat2-img");
+        var featCanvas = document.getElementById("feat2-canvas");
+        featImg.onload = () => {
+            featCanvas.width = featImg.width;
+            featCanvas.height = featImg.height;
+            featCanvas.getContext('2d').drawImage(featImg, 0, 0);
+            featImg.hidden = true;
+        }
+        featImg.src = "imgs/colors.png";
+        featCanvas.onclick = (ev) => {
+            var imageData = featCanvas.getContext('2d').getImageData(ev.offsetX, ev.offsetY, 1, 1);
+            penColor.r = imageData.data[0];
+            penColor.g = imageData.data[1];
+            penColor.b = imageData.data[2];
+            penColor.rainbow = null;
+        }
+    },
     //Large pen
     () => {
         penType = "pen";
@@ -219,12 +244,12 @@ const featFuncs = [
     //Change background image to a suggestion
     (roundNum, first) => {
         var backImage = document.getElementById("canvas-img");
-        if (!backImage.src || backImage.src == "") {
+        if (!backImage.src || backImage.src == "" || backImage.src == window.location.href) {
             canvasArea.backCanvas.style.backgroundColor = "transparent";
             backImage.src = imageLinks[Math.abs(roundNum-3)*2 + !first];
         }
         else {
-            backImage.src = "";
+            backImage.src = window.location.href;
             canvasArea.backCanvas.style.backgroundColor = "";
         }
     },
@@ -259,6 +284,9 @@ const featFuncs = [
         penType = null;
         penWidth = 3;
         penColor = {r: 0, g: 0, b: 0, a: 1, rainbow: null};
+        canvasHist = [];
+        canvasHist[0] = canvasArea.backCanvas.toDataURL();
+        currentHistIndex = 0;
     },
     //Highlighter
     () => {},
