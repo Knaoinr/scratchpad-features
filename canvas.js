@@ -3,6 +3,7 @@ var penType = null;
 
 var lastPenX = 0;
 var lastPenY = 0;
+var lastRake = null;
 
 var penWidth = 3;
 var penColor = {r: 0, g: 0, b: 0, a: 1, rainbow: null};
@@ -67,14 +68,60 @@ var canvasArea = {
                     ctx.fillRect(ev.x - sidebarWidth - s/2, ev.y - s/2, s, s);
                     ctx.restore();
                     break;
+                case "soft":
+                    ctx.save();
+                    ctx.filter = "blur(" + Math.ceil(Math.log(penWidth)/2+1) + "px)";
+                    ctx.beginPath();
+                    ctx.arc(ev.x - sidebarWidth, ev.y, penWidth/2, 0, 2 * Math.PI, true);
+                    ctx.fillStyle = getFlatPenColor();
+                    ctx.fill();
+                    ctx.restore();
+                    break;
                 case "stickFig":
-                    drawStamp(ev, "imgs/stickFig.png");
+                    drawStamp(ev, "imgs/stickfig.png");
                     break;
                 case "recycle":
                     drawStamp(ev, "imgs/recycle.png");
                     break;
                 case "hearts":
                     drawStamp(ev, "imgs/hearts.png");
+                    break;
+                case "rock":
+                    drawStamp(ev, "imgs/rock.png");
+                    break;
+                case "grass":
+                    drawStamp(ev, "imgs/grass.png");
+                    break;
+                case "door":
+                    if (Math.random() > 0.5) drawStamp(ev, "imgs/door0.png");
+                    else drawStamp(ev, "imgs/door1.png");
+                    break;
+                case "hair":
+                    drawStamp(ev, "imgs/hair" + Math.floor(Math.random()*4) + ".png");
+                    break;
+                case "mouse":
+                    drawStamp(ev, "imgs/mouse.png");
+                    break;
+                case ":D":
+                    drawStamp(ev, "imgs/smile.png");
+                    break;
+                case "sun":
+                    drawStamp(ev, "imgs/sun.png");
+                    break;
+                case "wheee":
+                    drawStamp(ev, "imgs/wheee.png");
+                    break;
+                case "star":
+                    drawStamp(ev, "imgs/star.png");
+                    break;
+                case "cloud":
+                    drawStamp(ev, "imgs/cloud.png");
+                    break;
+                case "dust":
+                    drawStamp(ev, "imgs/dust.png");
+                    break;
+                case "sparkle":
+                    drawStamp(ev, "imgs/sparkle.png");
                     break;
                 case "calligraphy":
                     ctx.save();
@@ -101,6 +148,8 @@ var canvasArea = {
             canvasArea.clear();
 
             recordBackCanvas();
+
+            lastRake = null;
         });
         this.canvas.addEventListener("mousemove", (ev) => {
             if (isPenDown) {
@@ -227,6 +276,116 @@ var canvasArea = {
                         ctx.closePath();
                         ctx.fillStyle = getFlatPenColor();
                         ctx.fill();
+                        ctx.restore();
+                        break;
+                    case "rake":
+                    case "rake2":
+                        ctx.save();
+                        ctx.strokeStyle = getFlatPenColor();
+                        ctx.lineCap = "round";
+                        ctx.lineWidth = penWidth;
+                        ctx.beginPath();
+                        ctx.moveTo(lastPenX - sidebarWidth, lastPenY);
+                        ctx.lineTo(ev.x - sidebarWidth, ev.y);
+                        var slope = -1*(ev.x - lastPenX)/(ev.y - lastPenY);
+                        var offset = {x: (ev.y > lastPenY ? -1 : 1)*5*Math.sqrt(penWidth*penWidth/(1 + slope*slope)), y: (ev.x > lastPenX ? -1 : 1)*5*Math.sqrt(penWidth*penWidth/(1 + 1/(slope*slope)))};
+                        if (!offset.y) {
+                            if (slope == 0) offset.y = (ev.x > lastPenX ? -1 : 1)*5;
+                        }
+                        if (lastRake) {
+                            ctx.moveTo(lastRake.leftX, lastRake.leftY);
+                            ctx.lineTo(lastPenX - sidebarWidth - offset.x, lastPenY + offset.y);
+                            ctx.moveTo(lastRake.rightX, lastRake.rightY);
+                            ctx.lineTo(lastPenX - sidebarWidth + offset.x, lastPenY - offset.y);
+
+                            //double
+                            if (penType == "rake2") {
+                                ctx.moveTo(lastRake.leftX2, lastRake.leftY2);
+                                ctx.lineTo(lastPenX - sidebarWidth - offset.x/2, lastPenY + offset.y/2);
+                                ctx.moveTo(lastRake.rightX2, lastRake.rightY2);
+                                ctx.lineTo(lastPenX - sidebarWidth + offset.x/2, lastPenY - offset.y/2);
+                            }
+                        }
+                        ctx.moveTo(lastPenX - sidebarWidth - offset.x, lastPenY + offset.y);
+                        ctx.lineTo(ev.x - sidebarWidth - offset.x, ev.y + offset.y);
+                        ctx.moveTo(lastPenX - sidebarWidth, lastPenY);
+                        ctx.lineTo(ev.x - sidebarWidth, ev.y);
+                        ctx.moveTo(lastPenX - sidebarWidth + offset.x, lastPenY - offset.y);
+                        ctx.lineTo(ev.x - sidebarWidth + offset.x, ev.y - offset.y);
+
+                        //double
+                        if (penType == "rake2") {
+                            ctx.moveTo(lastPenX - sidebarWidth - offset.x/2, lastPenY + offset.y/2);
+                            ctx.lineTo(ev.x - sidebarWidth - offset.x/2, ev.y + offset.y/2);
+                            ctx.moveTo(lastPenX - sidebarWidth + offset.x/2, lastPenY - offset.y/2);
+                            ctx.lineTo(ev.x - sidebarWidth + offset.x/2, ev.y - offset.y/2);
+                        }
+
+                        ctx.stroke();
+                        ctx.restore();
+                        lastRake = {leftX: ev.x - sidebarWidth - offset.x, leftY: ev.y + offset.y, rightX: ev.x - sidebarWidth + offset.x, rightY: ev.y - offset.y};
+                        if (penType == "rake2") {
+                            lastRake.leftX2 = ev.x - sidebarWidth - offset.x/2;
+                            lastRake.rightX2 = ev.x - sidebarWidth + offset.x/2;
+                            lastRake.leftY2 = ev.y + offset.y/2;
+                            lastRake.rightY2 = ev.y - offset.y/2;
+                        }
+                        break;
+                    case "arrow":
+                        canvasArea.clear();
+                        ctx.save();
+                        ctx.beginPath();
+                        ctx.moveTo(lastPenX - sidebarWidth, lastPenY);
+                        ctx.lineTo(ev.x - sidebarWidth, ev.y);
+                        ctx.strokeStyle = getFlatPenColor();
+                        ctx.lineWidth = penWidth;
+                        ctx.stroke();
+
+                        //erase the end
+                        ctx.save();
+                        ctx.beginPath();
+                        ctx.arc(ev.x - sidebarWidth, ev.y, penWidth, 0, 2 * Math.PI, true);
+                        ctx.globalCompositeOperation = "destination-out";
+                        ctx.fillStyle = "rgba(255,255,255,1)";
+                        ctx.fill();
+                        ctx.restore();
+
+                        var alpha = Math.atan((ev.y - lastPenY)/(ev.x - lastPenX)) - Math.PI/4;
+                        var one = 5*penWidth*Math.sin(alpha) * ((ev.x >= lastPenX) ? 1 : -1);
+                        var two = 5*penWidth*Math.cos(alpha) * ((ev.x >= lastPenX) ? 1 : -1);
+
+                        ctx.fillStyle = ctx.strokeStyle;
+                        ctx.beginPath();
+                        ctx.moveTo(ev.x - sidebarWidth, ev.y);
+                        ctx.lineTo(ev.x - sidebarWidth + one, ev.y - two);
+                        ctx.lineTo(ev.x - sidebarWidth - two, ev.y - one);
+                        ctx.closePath();
+                        ctx.fill();
+                        ctx.restore();
+                        return; //don't update lastPen
+                    case "soft":
+                        ctx.save();
+                        ctx.filter = "blur(" + Math.ceil(Math.log(penWidth)/2+1) + "px)";
+                        if (penWidth < 5) {
+                            ctx.beginPath();
+                            ctx.arc(ev.x - sidebarWidth, ev.y, penWidth/2, 0, 2 * Math.PI, true);
+                            ctx.fillStyle = getFlatPenColor();
+                            ctx.fill();
+                        } else {
+                            ctx.lineCap = "round";
+                        }
+                        ctx.beginPath();
+                        ctx.moveTo(lastPenX - sidebarWidth, lastPenY);
+                        ctx.lineTo(ev.x - sidebarWidth, ev.y);
+                        ctx.strokeStyle = getFlatPenColor();
+                        ctx.lineWidth = penWidth*2;
+                        ctx.stroke();
+                        ctx.restore();
+                        break;
+                    case "blend":
+                        ctx.save();
+                        ctx.filter = "blur(" + penWidth/2 + "px)";
+                        ctx.drawImage(canvasArea.backCanvas, ev.x - sidebarWidth, ev.y, penWidth*2, penWidth*2, ev.x - sidebarWidth, ev.y, penWidth*2, penWidth*2);
                         ctx.restore();
                         break;
                 }

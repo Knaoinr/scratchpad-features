@@ -2,10 +2,10 @@ const featNames = [
     "Pen", "Eraser", "Color grid", "Large pen", "Undo", "Redo", "Clear all", "Color picker", "Straight line", "Circle", //0-9
     "Oval", "Rectangle", "Calligraphy pen", "Change background color", "Set background image", "Opacity", "Rake", "Color wheel", "Rock stamp", "Grass stamp", //10-19
     "Square eraser", "Soft brush", "Rotate left", "Rotate right", "Bomb", "Small pen", "Swirl", "Double-pronged rake", "Save your image", "Horizontal line", //20-29
-    "Vertical line", "Stick figure stamp", "Smudge", "Sparkles", "Vertical flip", "Horizontal flip", "Change background image to a suggestion", "Dust", "Interference", "Lamp", //30-39
+    "Vertical line", "Stick figure stamp", "Blend", "Sparkles", "Vertical flip", "Horizontal flip", "Change background image to a suggestion", "Dust", "Interference", "Lamp", //30-39
     "Bloom", "Door stamp", "Background gradient", "Rainbow pen", "Draw your own brush", "Erase & blend rectangle", "Recycling stamp", "Hair stamp", "Turn off all features", "Highlighter", //40-49
-    "Lightning", "Heart stamp", "Ice crack", "X-shaped brush", "Mouse pointer stamp", "Grid", "Checkers stamp", "Arrows", "Cloud", "Star stamp", //50-59
-    "Very large brush", ":) stamp", "wheee stamp", "Sun stamp" //60-63
+    "Lightning", "Heart stamp", "Ice crack", "X-shaped brush", "Mouse pointer stamp", "Grid", "Checkers stamp", "Arrows", "Cloud stamp", "Star stamp", //50-59
+    "Very large brush", ":D stamp", "wheee stamp", "Sun stamp" //60-63
 ];
 
 const featSets = [
@@ -59,7 +59,7 @@ const featFuncs = [
         featWindow = document.createElement("div");
         featWindow.className = "feat-window";
         featWindow.id = "feat2";
-        featWindow.innerHTML = "<div>Choose a color:</div><img id=\"feat2-img\"></img><canvas id=\"feat2-canvas\"></canvas>";
+        featWindow.innerHTML = "<div>Choose a color:</div><img id=\"feat2-img\"></img><canvas id=\"feat2-canvas\"></canvas><div style=\"font-size:10px\">Image: Google</div>";
         document.getElementById("test").appendChild(featWindow);
 
         var featImg = document.getElementById("feat2-img");
@@ -170,7 +170,9 @@ const featFuncs = [
         document.getElementById("test").appendChild(featWindow);
     },
     //Rake
-    () => {},
+    () => {
+        penType = "rake";
+    },
     //Color wheel
     () => {
         if (featWindow) { featWindow.remove(); featWindow = null; return; }
@@ -189,15 +191,21 @@ const featFuncs = [
         document.getElementById("test").appendChild(featWindow);
     },
     //Rock stamp
-    () => {},
+    () => {
+        penType = "rock";
+    },
     //Grass stamp
-    () => {},
+    () => {
+        penType = "grass";
+    },
     //Square eraser
     () => {
         penType = "squareEraser";
     },
     //Soft brush
-    () => {},
+    () => {
+        penType = "soft";
+    },
     //Rotate left
     () => {},
     //Rotate right
@@ -212,7 +220,9 @@ const featFuncs = [
     //Swirl
     () => {},
     //Double-pronged rake
-    () => {},
+    () => {
+        penType = "rake2";
+    },
     //Save your image
     () => {}, //nothing lol
     //Horizontal line
@@ -227,10 +237,14 @@ const featFuncs = [
     () => {
         penType = "stickFig";
     },
-    //Smudge
-    () => {},
+    //Blend
+    () => {
+        penType = "blend";
+    },
     //Sparkles
-    () => {},
+    () => {
+        penType = "sparkle";
+    },
     //Vertical mirror
     () => {
         transform.scaleY *= -1;
@@ -254,17 +268,43 @@ const featFuncs = [
         }
     },
     //Dust
-    () => {},
+    () => {
+        penType = "dust";
+    },
     //Interference
-    () => {},
+    () => {
+        var ctx = canvasArea.backContext;
+        for(var x = 0; x < canvasArea.backCanvas.width; x += 5) {
+            for(var y = 0; y < canvasArea.backCanvas.height; y += 5) {
+                if (Math.random() > 0.9) {
+                    var imgData = ctx.createImageData(5, 5);
+                    imgData.data[0] = 255*Math.random();
+                    imgData.data[1] = 255*Math.random();
+                    imgData.data[2] = 255*Math.random();
+                    imgData.data[3] = 255;
+                    for (var i = 4; i < imgData.data.length; i += 4) {
+                        imgData.data[i+0] = imgData.data[0];
+                        imgData.data[i+1] = imgData.data[1];
+                        imgData.data[i+2] = imgData.data[1];
+                        imgData.data[i+3] = 255;
+                    }
+                    ctx.putImageData(imgData, x, y);
+                }
+            }
+        }
+    },
     //Lamp
     () => {},
     //Bloom
     () => {},
     //Door stamp
-    () => {},
+    () => {
+        penType = "door";
+    },
     //Background gradient
-    () => {},
+    () => {
+        canvasArea.backCanvas.style.backgroundImage = "linear-gradient(transparent, yellow)";
+    },
     //Rainbow pen
     () => {
         penColor.rainbow = 0;
@@ -278,7 +318,9 @@ const featFuncs = [
         penType = "recycle";
     },
     //Hair stamp
-    () => {},
+    () => {
+        penType = "hair";
+    },
     //Turn off all features
     () => {
         penType = null;
@@ -301,28 +343,42 @@ const featFuncs = [
     //X-shaped brush
     () => {},
     //Mouse pointer stamp
-    () => {},
+    () => {
+        penType = "mouse";
+    },
     //Grid
     () => {},
     //Checkers stamp
     () => {},
     //Arrows
-    () => {},
-    //Cloud
-    () => {},
+    () => {
+        penType = "arrow";
+    },
+    //Cloud stamp
+    () => {
+        penType = "cloud";
+    },
     //Star stamp
-    () => {},
+    () => {
+        penType = "star";
+    },
     //Very large brush
     () => {
         penType = "pen";
         penWidth = 20;
     },
-    //:) stamp
-    () => {},
+    //:D stamp
+    () => {
+        penType = ":D";
+    },
     //wheee stamp
-    () => {},
+    () => {
+        penType = "wheee";
+    },
     //Sun stamp
-    () => {}
+    () => {
+        penType = "sun";
+    }
 ];
 
 const keywords = [
