@@ -364,6 +364,7 @@ const featFuncs = [
         currentHistIndex = 0;
         transform.rotate = 0;
         applyTransform();
+        if (featWindow) { featWindow.remove(); featWindow = null; }
     },
     //Highlighter
     () => {
