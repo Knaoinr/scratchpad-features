@@ -3,7 +3,7 @@ const featNames = [
     "Oval", "Rectangle", "Calligraphy pen", "Change background color", "Set background image", "Opacity", "Rake", "Color wheel", "Rock stamp", "Grass stamp", //10-19
     "Square eraser", "Soft brush", "Rotate left", "Rotate right", "Bomb", "Small pen", "Swirl", "Double-pronged rake", "Save your image", "Horizontal line", //20-29
     "Vertical line", "Stick figure stamp", "Blend", "Sparkles", "Vertical flip", "Horizontal flip", "Change background image to a suggestion", "Dust", "Interference", "Lamp", //30-39
-    "Bloom", "Door stamp", "Background gradient", "Rainbow pen", "Draw your own brush", "Erase & blend rectangle", "Recycling stamp", "Hair stamp", "Turn off all features", "Highlighter", //40-49
+    "Blossom stamp", "Door stamp", "Background gradient", "Rainbow pen", "Draw your own brush", "Erase & blend rectangle", "Recycling stamp", "Hair stamp", "Turn off all features", "Highlighter", //40-49
     "Lightning", "Heart stamp", "Ice crack", "X-shaped brush", "Mouse pointer stamp", "Grid", "Checkers stamp", "Arrows", "Cloud stamp", "Star stamp", //50-59
     "Very large brush", ":D stamp", "wheee stamp", "Sun stamp" //60-63
 ];
@@ -207,9 +207,15 @@ const featFuncs = [
         penType = "soft";
     },
     //Rotate left
-    () => {},
+    () => {
+        transform.rotate -= 30;
+        applyTransform();
+    },
     //Rotate right
-    () => {},
+    () => {
+        transform.rotate += 30;
+        applyTransform();
+    },
     //Bomb
     () => {},
     //Small pen
@@ -292,18 +298,26 @@ const featFuncs = [
                 }
             }
         }
+        recordBackCanvas();
     },
     //Lamp
     () => {},
-    //Bloom
-    () => {},
+    //Blossom stamp
+    () => {
+        penType = "blossom";
+    },
     //Door stamp
     () => {
         penType = "door";
     },
     //Background gradient
     () => {
-        canvasArea.backCanvas.style.backgroundImage = "linear-gradient(transparent, yellow)";
+        var prior = canvasArea.backCanvas.style.backgroundColor;
+        canvasArea.backCanvas.style.backgroundColor = "transparent";
+        window.setTimeout(() => {
+            canvasArea.backCanvas.style.backgroundImage = "linear-gradient(transparent, " + getPenColor() + ")";
+            canvasArea.backCanvas.style.backgroundColor = prior;
+        }, 1);
     },
     //Rainbow pen
     () => {
@@ -329,9 +343,15 @@ const featFuncs = [
         canvasHist = [];
         canvasHist[0] = canvasArea.backCanvas.toDataURL();
         currentHistIndex = 0;
+        transform.rotate = 0;
+        applyTransform();
     },
     //Highlighter
-    () => {},
+    () => {
+        penType = "highlighter";
+        penColor.a = 0.38;
+        canvasArea.canvas.style.opacity = penColor.a;
+    },
     //Lightning
     () => {},
     //Heart stamp
@@ -341,15 +361,40 @@ const featFuncs = [
     //Ice crack
     () => {},
     //X-shaped brush
-    () => {},
+    () => {
+        penType = "x";
+    },
     //Mouse pointer stamp
     () => {
         penType = "mouse";
     },
     //Grid
-    () => {},
+    () => {
+        var spacing = penWidth*10;
+        var ctx = canvasArea.backContext;
+        ctx.save();
+        ctx.strokeStyle = getFlatPenColor();
+        ctx.lineWidth = penWidth;
+        console.log(canvasArea.backCanvas);
+        for(var x = spacing; x < canvasArea.backCanvas.width; x += spacing) {
+            ctx.beginPath();
+            ctx.moveTo(x, 0);
+            ctx.lineTo(x, canvasArea.backCanvas.height);
+            ctx.stroke();
+        }
+        for(var y = spacing; y < canvasArea.backCanvas.height; y += spacing) {
+            ctx.beginPath();
+            ctx.moveTo(0, y);
+            ctx.lineTo(canvasArea.backCanvas.width, y);
+            ctx.stroke();
+        }
+        ctx.restore();
+        recordBackCanvas();
+    },
     //Checkers stamp
-    () => {},
+    () => {
+        penType = "checkers";
+    },
     //Arrows
     () => {
         penType = "arrow";

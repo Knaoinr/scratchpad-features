@@ -123,6 +123,9 @@ var canvasArea = {
                 case "sparkle":
                     drawStamp(ev, "imgs/sparkle.png");
                     break;
+                case "blossom":
+                    drawStamp(ev, "imgs/blossom.png");
+                    break;
                 case "calligraphy":
                     ctx.save();
                     ctx.beginPath();
@@ -131,6 +134,48 @@ var canvasArea = {
                     ctx.strokeStyle = getFlatPenColor();
                     ctx.lineWidth = 2;
                     ctx.stroke();
+                    ctx.restore();
+                    break;
+                case "x":
+                    ctx.save();
+                    ctx.lineWidth = 2;
+                    ctx.strokeStyle = getFlatPenColor();
+                    ctx.beginPath();
+                    ctx.moveTo(ev.x - sidebarWidth - penWidth, ev.y + penWidth);
+                    ctx.lineTo(ev.x - sidebarWidth + penWidth, ev.y - penWidth);
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.moveTo(ev.x - sidebarWidth - penWidth, ev.y - penWidth);
+                    ctx.lineTo(ev.x - sidebarWidth + penWidth, ev.y + penWidth);
+                    ctx.stroke();
+                    ctx.restore();
+                    break;
+                case "highlighter":
+                    ctx.save();
+                    ctx.beginPath();
+                    ctx.moveTo(ev.x - sidebarWidth - penWidth, ev.y - penWidth*2);
+                    ctx.lineTo(ev.x - sidebarWidth - penWidth, ev.y + penWidth*2);
+                    ctx.lineTo(ev.x - sidebarWidth + penWidth, ev.y + penWidth*2);
+                    ctx.lineTo(ev.x - sidebarWidth + penWidth, ev.y - penWidth*2);
+                    ctx.closePath();
+                    ctx.fillStyle = "rgb(255,247,0)";;
+                    ctx.fill();
+                    ctx.restore();
+                    break;
+                case "checkers":
+                    ctx.save();
+                    ctx.fillStyle = getFlatPenColor();
+                    for(var i = 0; i < 25; i += 2) {
+                        var x = ev.x - sidebarWidth + (i%5 - 2)*2*penWidth;
+                        var y = ev.y + (Math.floor(i/5) - 2)*2*penWidth;
+                        ctx.beginPath();
+                        ctx.moveTo(x-penWidth, y-penWidth);
+                        ctx.lineTo(x-penWidth, y+penWidth);
+                        ctx.lineTo(x+penWidth, y+penWidth);
+                        ctx.lineTo(x+penWidth, y-penWidth);
+                        ctx.closePath();
+                        ctx.fill();
+                    }
                     ctx.restore();
                     break;
             }
@@ -143,6 +188,9 @@ var canvasArea = {
             canvasArea.backContext.save();
             canvasArea.backContext.globalAlpha = penColor.a;
             canvasArea.backContext.scale(transform.scaleX, transform.scaleY);
+            canvasArea.backContext.translate(canvasArea.backCanvas.width/2, canvasArea.backCanvas.height/2);
+            canvasArea.backContext.rotate(-transform.rotate * Math.PI/180);
+            canvasArea.backContext.translate(-canvasArea.backCanvas.width/2, -canvasArea.backCanvas.height/2);
             canvasArea.backContext.drawImage(canvasArea.canvas, 0, 0, this.canvas.width*transform.scaleX, this.canvas.height*transform.scaleY);
             canvasArea.backContext.restore();
             canvasArea.clear();
@@ -275,6 +323,40 @@ var canvasArea = {
                         ctx.lineTo(lastPenX - sidebarWidth + penWidth/2, lastPenY - penWidth);
                         ctx.closePath();
                         ctx.fillStyle = getFlatPenColor();
+                        ctx.fill();
+                        ctx.restore();
+                        break;
+                    case "x":
+                        ctx.save();
+                        ctx.fillStyle = getFlatPenColor();
+                        ctx.beginPath();
+                        ctx.moveTo(lastPenX - sidebarWidth - penWidth, lastPenY + penWidth);
+                        ctx.lineTo(ev.x - sidebarWidth - penWidth, ev.y + penWidth);
+                        ctx.lineTo(ev.x - sidebarWidth + penWidth, ev.y - penWidth);
+                        ctx.lineTo(lastPenX - sidebarWidth + penWidth, lastPenY - penWidth);
+                        ctx.closePath();
+                        ctx.fill();
+                        ctx.beginPath();
+                        ctx.moveTo(lastPenX - sidebarWidth - penWidth, lastPenY - penWidth);
+                        ctx.lineTo(ev.x - sidebarWidth - penWidth, ev.y - penWidth);
+                        ctx.lineTo(ev.x - sidebarWidth + penWidth, ev.y + penWidth);
+                        ctx.lineTo(lastPenX - sidebarWidth + penWidth, lastPenY + penWidth);
+                        ctx.closePath();
+                        ctx.fill();
+                        ctx.restore();
+                        break;
+                    case "highlighter":
+                        ctx.save();
+                        ctx.beginPath();
+                        var higher = {x: (ev.x >= lastPenX) ? 1 : -1, y: (ev.y >= lastPenY) ? 1 : -1};
+                        ctx.moveTo(ev.x - sidebarWidth + penWidth*higher.x, ev.y + penWidth*2*higher.y);
+                        ctx.lineTo(ev.x - sidebarWidth + penWidth*higher.x, ev.y - penWidth*2*higher.y);
+                        ctx.lineTo(lastPenX - sidebarWidth + penWidth*higher.x, lastPenY - penWidth*2*higher.y);
+                        ctx.lineTo(lastPenX - sidebarWidth - penWidth*higher.x, lastPenY - penWidth*2*higher.y);
+                        ctx.lineTo(lastPenX - sidebarWidth - penWidth*higher.x, lastPenY + penWidth*2*higher.y);
+                        ctx.lineTo(ev.x - sidebarWidth - penWidth*higher.x, ev.y + penWidth*2*higher.y);
+                        ctx.closePath();
+                        ctx.fillStyle = "rgb(255,247,0)";
                         ctx.fill();
                         ctx.restore();
                         break;
@@ -427,7 +509,7 @@ function getHex() {
 }
 
 function applyTransform() {
-    canvasArea.backCanvas.style.transform = "rotate(" + transform.rotate + ") scaleX(" + transform.scaleX + ") scaleY(" + transform.scaleY + ")";
+    canvasArea.backCanvas.style.transform = "rotate(" + transform.rotate + "deg) scaleX(" + transform.scaleX + ") scaleY(" + transform.scaleY + ")";
 }
 
 function recordBackCanvas() {
