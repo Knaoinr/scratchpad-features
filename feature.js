@@ -1,10 +1,10 @@
 const featNames = [
     "Pen", "Eraser", "Color grid", "Large pen", "Undo", "Redo", "Clear all", "Color picker", "Straight line", "Circle", //0-9
     "Oval", "Rectangle", "Calligraphy pen", "Change background color", "Set background image", "Opacity", "Rake", "Color wheel", "Rock stamp", "Grass stamp", //10-19
-    "Square eraser", "Soft brush", "Rotate left", "Rotate right", "Bomb", "Small pen", "Swirl", "Double-pronged rake", "Save your image", "Horizontal line", //20-29
+    "Square eraser", "Soft brush", "Rotate left", "Rotate right", "Draw behind", "Small pen", "Swirl", "Double-pronged rake", "Save your image", "Horizontal line", //20-29
     "Vertical line", "Stick figure stamp", "Blend", "Sparkles", "Vertical flip", "Horizontal flip", "Change background image to a suggestion", "Dust", "Interference", "Lamp", //30-39
     "Blossom stamp", "Door stamp", "Background gradient", "Rainbow pen", "Draw your own brush", "Erase & blend rectangle", "Recycling stamp", "Hair stamp", "Turn off all features", "Highlighter", //40-49
-    "Lightning", "Heart stamp", "Ice crack", "X-shaped brush", "Mouse pointer stamp", "Grid", "Checkers stamp", "Arrows", "Cloud stamp", "Star stamp", //50-59
+    "Lightning", "Heart stamp", "Lines", "X-shaped brush", "Mouse pointer stamp", "Grid", "Checkers stamp", "Arrows", "Cloud stamp", "Star stamp", //50-59
     "Very large brush", ":D stamp", "wheee stamp", "Sun stamp" //60-63
 ];
 
@@ -36,7 +36,9 @@ const featSets = [
     //3.64
     [29, 32, 7, 33, 27, 3, 16, 54, 0, 56, 51, 31, 10, 20, 25, 37, 13, 41, 48, 18, 34, 9, 40, 44, 6, 4, 1, 17, 43, 57, 61, 28, 21, 5, 12, 46, 23, 59, 50, 35, 2, 15, 19, 53, 60, 49, 45, 30, 58, 39, 42, 8, 11, 63, 26, 24, 36, 22, 55, 52, 38, 47, 62, 14],
     //3.128
-    [5, 46, 44, 32, 58, 39, 27, 9, 12, 49, 41, 45, 8, 13, 23, 31, 10, 29, 14, 0, 47, 49, 18, 9, 22, 50, 28, 36, 21, 60, 51, 40, 57, 11, 53, 36, 55, 32, 20, 7, 29, 16, 8, 1, 25, 57, 28, 25, 0, 33, 17, 35, 27, 54, 13, 37, 61, 18, 5, 46, 7, 12, 1, 53, 58, 21, 19, 34, 2, 38, 15, 44, 56, 61, 4, 11, 41, 6, 19, 42, 4, 42, 60, 45, 43, 3, 62, 30, 43, 33, 22, 39, 56, 10, 6, 52, 14, 20, 3, 26, 48, 23, 63, 55, 24, 37, 62, 51, 15, 59, 52, 24, 31, 47, 34, 35, 2, 17, 48, 26, 40, 63, 59, 54, 38, 50, 16, 30]
+    [5, 46, 44, 32, 58, 39, 27, 9, 12, 49, 41, 45, 8, 13, 23, 31, 10, 29, 14, 0, 47, 49, 18, 9, 22, 50, 28, 36, 21, 60, 51, 40, 57, 11, 53, 36, 55, 32, 20, 7, 29, 16, 8, 1, 25, 57, 28, 25, 0, 33, 17, 35, 27, 54, 13, 37, 61, 18, 5, 46, 7, 12, 1, 53, 58, 21, 19, 34, 2, 38, 15, 44, 56, 61, 4, 11, 41, 6, 19, 42, 4, 42, 60, 45, 43, 3, 62, 30, 43, 33, 22, 39, 56, 10, 6, 52, 14, 20, 3, 26, 48, 23, 63, 55, 24, 37, 62, 51, 15, 59, 52, 24, 31, 47, 34, 35, 2, 17, 48, 26, 40, 63, 59, 54, 38, 50, 16, 30],
+    //free doodle: 64
+    [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63]
 ];
 
 var featWindow = null; // The element corresponding to an open feature window
@@ -216,15 +218,20 @@ const featFuncs = [
         transform.rotate += 30;
         applyTransform();
     },
-    //Bomb
-    () => {},
+    //Draw behind
+    () => {
+        if (composition == "destination-over") composition = null;
+        else composition = "destination-over";
+    },
     //Small pen
     () => {
         penType = "pen";
         penWidth = 1;
     },
     //Swirl
-    () => {},
+    () => {
+        penType = "swirl";
+    },
     //Double-pronged rake
     () => {
         penType = "rake2";
@@ -301,7 +308,11 @@ const featFuncs = [
         recordBackCanvas();
     },
     //Lamp
-    () => {},
+    () => {
+        penType = "lamp";
+        penColor = {r: 255, g: 247, b: 0, a: 0.38, rainbow: null};
+        canvasArea.canvas.style.opacity = penColor.a;
+    },
     //Blossom stamp
     () => {
         penType = "blossom";
@@ -323,10 +334,18 @@ const featFuncs = [
     () => {
         penColor.rainbow = 0;
     },
-    //Draw your own brush
-    () => {},
+    //Darken
+    () => {
+        if (composition == "darken") composition = null;
+        else composition = "darken";
+    },
     //Erase & blend rectangle
-    () => {},
+    () => {
+        penType = "rect-erase";
+        penWidth = 3;
+        penColor = {r: 0, g: 0, b: 0, a: 1, rainbow: null};
+        canvasArea.canvas.style.opacity = penColor.a;
+    },
     //Recycling stamp
     () => {
         penType = "recycle";
@@ -352,14 +371,21 @@ const featFuncs = [
         penColor.a = 0.38;
         canvasArea.canvas.style.opacity = penColor.a;
     },
-    //Lightning
-    () => {},
+    //Lighten
+    () => {
+        if (composition == "lighten") composition = null;
+        else composition = "lighten";
+    },
     //Heart stamp
     () => {
         penType = "hearts";
     },
-    //Ice crack
-    () => {},
+    //Lines
+    () => {
+        penType = "lines";
+        penColor = {r: 100, g: 100, b: 100, a: 1, rainbow: null};
+        canvasArea.canvas.style.opacity = penColor.a;
+    },
     //X-shaped brush
     () => {
         penType = "x";

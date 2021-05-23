@@ -13,6 +13,9 @@ var transform = {rotate: 0, scaleX: 1, scaleY: 1};
 var canvasHist = [];
 var currentHistIndex = 0;
 
+var action = null;
+var composition = null;
+
 const sidebarWidth = 200;
 
 var canvasArea = {
@@ -178,14 +181,100 @@ var canvasArea = {
                     }
                     ctx.restore();
                     break;
+                case "swirl":
+                    var r = 10;
+                    var theta = 0;
+                    action = window.setInterval(() => {
+                        ctx.save();
+                        ctx.translate(lastPenX - sidebarWidth, lastPenY);
+                        ctx.rotate(theta);
+                        ctx.translate(-lastPenX + sidebarWidth, -lastPenY);
+                        ctx.globalCompositeOperation = "destination-over";
+                        ctx.drawImage(canvasArea.backCanvas, lastPenX - sidebarWidth - r, lastPenY - r, r*2, r*2, lastPenX - sidebarWidth - r, lastPenY - r, r*2, r*2);
+                        ctx.globalCompositeOperation = "destination-in";
+                        ctx.beginPath();
+                        ctx.arc(lastPenX - sidebarWidth, lastPenY, r, 0, 2 * Math.PI, true);
+                        ctx.fill();
+                        ctx.restore();
+                        r++;
+                        theta += 0.1;
+                    }, 100);
+                    break;
+                case "lamp":
+                    var lampWidth = 20;
+                    ctx.save();
+                    ctx.fillStyle = "white";
+                    ctx.fillRect(ev.x - sidebarWidth - lampWidth/2, ev.y - lampWidth/2, lampWidth, lampWidth);
+                    ctx.restore();
+                    break;
+                case "lines":
+                    ctx.save();
+                    ctx.strokeStyle = getFlatPenColor();
+                    ctx.lineWidth = 1;
+                    for(var i = 0; i < Math.random()*4 + 3; i++) {
+                        var num = Math.floor(Math.random()*(canvasArea.canvas.width*2 + canvasArea.canvas.height*2 - 4));
+                        var x = 0;
+                        if (num < canvasArea.canvas.width*2) x = num%canvasArea.canvas.width;
+                        else if (num >= canvasArea.canvas.width*2 + canvasArea.canvas.height - 2) x = canvasArea.canvas.width-1;
+                        var y = 0;
+                        if (num >= canvasArea.canvas.width*2) y = (num-canvasArea.canvas.width*2)%canvasArea.canvas.width;
+                        else if (num >= canvasArea.canvas.width) y = canvasArea.canvas.height-1;
+                        ctx.beginPath();
+                        ctx.moveTo(ev.x - sidebarWidth, ev.y);
+                        ctx.lineTo(x, y);
+                        ctx.stroke();
+                    }
+                    ctx.restore();
+                    break;
             }
 
             lastPenX = ev.x;
             lastPenY = ev.y;
         });
         this.canvas.addEventListener("mouseup", (ev) => {
+            if (action !== null) { window.clearInterval(action); action = null; }
+
+            if (penType == "rect-erase") {
+                canvasArea.clear();
+                isPenDown = false;
+                window.setTimeout(() => {
+                    if (lastPenX == ev.x || lastPenY == ev.y) return;
+                    canvasArea.backContext.save();
+                    canvasArea.backContext.scale(transform.scaleX, transform.scaleY);
+                    canvasArea.backContext.translate(canvasArea.backCanvas.width/2, canvasArea.backCanvas.height/2);
+                    canvasArea.backContext.rotate(-transform.rotate * Math.PI/180);
+                    canvasArea.backContext.translate(-canvasArea.backCanvas.width/2, -canvasArea.backCanvas.height/2);
+                    var imgData = canvasArea.backContext.getImageData(lastPenX - sidebarWidth, lastPenY, ev.x - lastPenX, ev.y - lastPenY);
+                    var total = [0, 0, 0, 0, 0];
+                    for(var i = 0; i < imgData.width; i++) {
+                        for(var j = 0; j < 4; j++) {
+                            total[j] += imgData.data[i*4 + j];
+                            total[j] += imgData.data[(imgData.height-1)*imgData.width*4 + i*4 + j];
+                        }
+                        total[4] += 2;
+                    }
+                    for(var i = 1; i < imgData.height-1; i++) {
+                        for(var j = 0; j < 4; j++) {
+                            total[j] += imgData.data[i*4*imgData.width + j];
+                            total[j] += imgData.data[(i+1)*4*imgData.width - 4 + j];
+                        }
+                        total[4] += 2;
+                    }
+                    canvasArea.backContext.globalCompositeOperation = "destination-out";
+                    canvasArea.backContext.fillStyle = "white";
+                    canvasArea.backContext.fillRect(lastPenX - sidebarWidth, lastPenY, ev.x - lastPenX, ev.y - lastPenY);
+                    canvasArea.backContext.globalCompositeOperation = "source-over";
+                    canvasArea.backContext.fillStyle = "rgba(" + total[0]/total[4] + "," + total[1]/total[4] + "," + total[2]/total[4] + "," + (total[3]/total[4])/255 + ")";
+                    canvasArea.backContext.fillRect(lastPenX - sidebarWidth, lastPenY, ev.x - lastPenX, ev.y - lastPenY);
+                    canvasArea.backContext.restore();
+                    recordBackCanvas();
+                }, 1);
+                return;
+            }
+
             isPenDown = false;
             canvasArea.backContext.save();
+            if (composition) canvasArea.backContext.globalCompositeOperation = composition;
             canvasArea.backContext.globalAlpha = penColor.a;
             canvasArea.backContext.scale(transform.scaleX, transform.scaleY);
             canvasArea.backContext.translate(canvasArea.backCanvas.width/2, canvasArea.backCanvas.height/2);
@@ -265,6 +354,7 @@ var canvasArea = {
                         ctx.restore();
                         return; //don't update lastPen
                     case "rect":
+                    case "rect-erase":
                         canvasArea.clear();
                         ctx.save();
                         ctx.beginPath();
@@ -467,9 +557,31 @@ var canvasArea = {
                     case "blend":
                         ctx.save();
                         ctx.filter = "blur(" + penWidth/2 + "px)";
-                        ctx.drawImage(canvasArea.backCanvas, ev.x - sidebarWidth, ev.y, penWidth*2, penWidth*2, ev.x - sidebarWidth, ev.y, penWidth*2, penWidth*2);
+                        ctx.drawImage(canvasArea.backCanvas, ev.x - sidebarWidth - penWidth, ev.y - penWidth, penWidth*2, penWidth*2, ev.x - sidebarWidth - penWidth, ev.y - penWidth, penWidth*2, penWidth*2);
                         ctx.restore();
                         break;
+                    case "lamp":
+                        canvasArea.clear();
+                        var lampWidth = 20;
+                        ctx.save();
+                        canvasArea.context.translate(lastPenX - sidebarWidth, lastPenY);
+                        canvasArea.context.rotate(-Math.atan((ev.x - lastPenX)/(ev.y - lastPenY)) + ((ev.y > lastPenY) ? 0 : Math.PI));
+                        canvasArea.context.translate(-lastPenX + sidebarWidth, -lastPenY);
+                        ctx.fillStyle = "white";
+                        ctx.fillRect(lastPenX - sidebarWidth - lampWidth/2, lastPenY - lampWidth/2, lampWidth, lampWidth);
+                        ctx.strokeStyle = "black";
+                        ctx.lineWidth = 2;
+                        ctx.strokeRect(lastPenX - sidebarWidth - lampWidth/2, lastPenY - lampWidth/2, lampWidth, lampWidth);
+                        ctx.fillStyle = getFlatPenColor();
+                        ctx.beginPath();
+                        ctx.moveTo(lastPenX - sidebarWidth + lampWidth/2, lastPenY + lampWidth/2);
+                        ctx.lineTo(lastPenX - sidebarWidth + 10*lampWidth, lastPenY + canvasArea.canvas.height+canvasArea.canvas.width);
+                        ctx.lineTo(lastPenX - sidebarWidth - 10*lampWidth, lastPenY + canvasArea.canvas.height+canvasArea.canvas.width);
+                        ctx.lineTo(lastPenX - sidebarWidth - lampWidth/2, lastPenY + lampWidth/2);
+                        ctx.closePath();
+                        ctx.fill();
+                        ctx.restore();
+                        return; //don't update lastPen
                 }
 
                 lastPenX = ev.x;

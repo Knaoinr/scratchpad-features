@@ -5,7 +5,7 @@
     <title>Test</title>
     <link rel="stylesheet" href="index.css" />
 </head>
-<body onload="offlineInit(0)">
+<body onload="init()">
     <!-- Mobile screen -->
     <div id="mobile">
         Unfortunately, your window needs to be at least 800 pixels wide and 600 pixels tall for this.
@@ -13,7 +13,7 @@
     </div>
 
     <!-- Welcome screen -->
-    <div class="main" id="welcome">
+    <div class="main center" id="welcome">
         <div class="welcome-content header">Welcome!</div>
         <div class="welcome-content" id="welcome-text">
             The next few pages will each feature a canvas, a sidebar with different features you can use, and a word or phrase in the top right corner.
@@ -29,6 +29,10 @@
             Ideally, it should be completed in one sitting.
             If you are interrupted, however, or the time is not accurate in some other way, there will be an option to disregard the time you took on each round.
             All in all, the time is not too important; it is just used as a measure to see how quickly you adapt to the interfaces.
+            <br/><br/>
+            Please do not change the size of this window.
+            <br/><br/>
+            Note: You will have the option to just play around n doodle at the end if you want :)
         </div>
         <button class="welcome-content" id="welcome-start" onclick="startTests()">START</button>
     </div>
@@ -50,20 +54,35 @@
     <div class="main" id="choice">
         <div class="header">Which features do you prefer?</div>
         <div id="choice-container">
-            <button class="choice-button" id="choice-button-1"></button>
-            <button class="choice-button" id="choice-button-2"></button>
+            <div class="mini-choice-container"><span id="choice-first">First set</span><br/><button class="choice-button" id="choice-button-1"></button></div>
+            <div class="mini-choice-container"><span id="choice-second">Second set</span><br/><button class="choice-button" id="choice-button-2"></button></div>
         </div>
     </div>
 
     <!-- Data submission screen -->
     <div class="main" id="submit">
-        <!-- ? -->
         <form class="gform" method="POST">
-            <div class="form-elements">
+            <div class="form-elements center">
+                <textarea name="Feature set" hidden=true></textarea>
+                <textarea name="Final choice" hidden=true></textarea>
+                <textarea name="Times" hidden=true></textarea>
+                <textarea name="On sidebar" hidden=true></textarea>
+                <textarea name="On canvas" hidden=true></textarea>
+                <textarea name="Clicks" hidden=true></textarea>
+                <textarea name="Screen height" hidden=true></textarea>
+
+                Ignore your times?<input type="checkbox" value="false" name="Ignore times?" onclick="this.value = this.checked"></input>
+                <br/>
+                Any comments?<textarea name="Comments"></textarea>
+                <br/>
                 <button>Send</button>
-                <textarea name="Feature set"></textarea>
             </div>
         </form>
+    </div>
+
+    <!-- Thank you screen -->
+    <div class="main center" id="thanks">
+        <div>Thank you! To doodle with all 64 features, visit <a href="freedoodle.html">this page</a> :)</div>
     </div>
 
     <script src="feature.js"></script>

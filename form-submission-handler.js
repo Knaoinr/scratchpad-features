@@ -61,6 +61,12 @@
       disableAllButtons(form);
       var url = spreadsheetScript;
       var xhr = new XMLHttpRequest();
+      xhr.onreadystatechange = function() {
+        if (this.readyState == 4) {
+          document.getElementById("submit").style.visibility = "hidden";
+          document.getElementById("thanks").style.visibility = "visible";
+        }
+      };
       xhr.open('POST', url);
       xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
       // url encode form data for sending as post data
